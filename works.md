@@ -537,3 +537,77 @@ Agent Client Protocol 集成，用于 IDE 客户端：
 4. **acp 模块完善** - 实现 session-mapper, translator 等辅助功能
 
 *最后更新: 2026-02-27*
+
+
+## 第 81 轮工作记录 (2026-02-27)
+
+### 完成工作
+
+本轮专注于完善 plugins 和 acp 模块的缺失文件。
+
+### 新增文件
+
+#### plugins 模块
+| 文件 | 行数 | 功能描述 |
+|------|------|----------|
+| `plugins/runtime.go` | 55 | 全局插件注册表状态管理 |
+| `plugins/runtime/native_deps.go` | 75 | 原生依赖提示格式化 |
+
+#### acp 模块
+| 文件 | 行数 | 功能描述 |
+|------|------|----------|
+| `acp/session_mapper.go` | 202 | 会话密钥解析和重置功能 |
+| `acp/commands.go` | 56 | 可用命令列表定义 |
+| `acp/event_mapper.go` | 228 | 事件映射、文本提取、工具格式化 |
+| `acp/meta.go` | 80 | 元数据读取工具函数 |
+| `acp/secret_file.go` | 35 | 从文件读取密钥 |
+
+### 功能详情
+
+**plugins/runtime.go**:
+- `SetActivePluginRegistry()` - 设置活动插件注册表
+- `GetActivePluginRegistry()` - 获取活动插件注册表
+- `RequireActivePluginRegistry()` - 获取或创建活动插件注册表
+- `GetActivePluginRegistryKey()` - 获取注册表缓存键
+
+**plugins/runtime/native_deps.go**:
+- `FormatNativeDependencyHint()` - 格式化原生依赖安装提示
+- 支持 pnpm/npm/yarn 包管理器
+
+**acp/session_mapper.go**:
+- `ParseSessionMeta()` - 解析会话元数据
+- `ResolveSessionKey()` - 解析会话密钥
+- `ResetSessionIfNeeded()` - 按需重置会话
+
+**acp/commands.go**:
+- `GetAvailableCommands()` - 返回所有可用命令列表
+- 包含 help, status, context, think, model 等命令
+
+**acp/event_mapper.go**:
+- `ExtractTextFromPrompt()` - 从 ACP 提示中提取文本
+- `ExtractAttachmentsFromPrompt()` - 提取图片附件
+- `FormatToolTitle()` - 格式化工具标题
+- `InferToolKind()` - 推断工具类型
+- `EscapeInlineControlChars()` - 转义内联控制字符
+
+**acp/meta.go**:
+- `ReadString()`, `ReadNumber()`, `ReadBool()` - 读取元数据字段
+- `ReadStringSlice()`, `ReadMap()` - 读取复杂数据类型
+
+**acp/secret_file.go**:
+- `ReadSecretFromFile()` - 从文件读取密钥
+- `ReadGatewayTokenFromFile()`, `ReadGatewayPasswordFromFile()` - 专用读取函数
+
+### 编译状态
+
+✅ 全部编译通过
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| 新增 Go 文件 | 7 |
+| 新增代码行数 | ~730 |
+| Go 总文件数 | ~724 |
+
+*最后更新: 2026-02-27*
