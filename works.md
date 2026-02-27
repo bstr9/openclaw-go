@@ -611,3 +611,136 @@ Agent Client Protocol 集成，用于 IDE 客户端：
 | Go 总文件数 | ~724 |
 
 *最后更新: 2026-02-27*
+
+## 第 82 轮工作记录 (2026-02-27)
+
+### 完成工作
+
+本轮专注于实现缺失的命令和网关方法处理器。
+
+### 新增文件
+
+#### commands 模块
+| 文件 | 行数 | 功能描述 |
+|------|------|----------|
+| `dashboard.go` | 261 | Dashboard URL 生成和浏览器打开
+| `configure_commands.go` | 134 | Configure 向导命令
+| `channels/add.go` | 204 | 渠道账户添加命令
+| `channels/list.go` | 74 | 渠道列表命令
+| `channels/status.go` | 151 | 渠道状态命令
+| `channels/remove.go` | 53 | 渠道移除命令
+| `channels/resolve.go` | 42 | 渠道解析命令
+| `channels/capabilities.go` | 104 | 渠道能力查询命令
+| `channels/logs.go` | 47 | 渠道日志命令 |
+
+#### gateway/methods 模块
+| 文件 | 行数 | 功能描述 |
+|------|------|----------|
+| `chat_methods.go` | 76 | chat.history/chat.abort/chat.send/chat.inject 方法
+| `tts_handlers.go` | 111 | tts.status/providers/enable/disable/convert/setProvider 方法
+| `wizard_handlers.go` | 71 | wizard.start/next/cancel/status 方法 |
+
+### 功能详情
+
+**channels 命令:**
+- `channels add` - 添加渠道账户配置，支持所有渠道参数
+- `channels list` - 列出所有配置的渠道账户
+- `channels status` - 显示渠道状态，支持 JSON 输出和探测模式
+- `channels remove` - 移除渠道账户配置
+- `channels resolve` - 解析渠道目标地址
+- `channels capabilities` - 显示各渠道支持的能力
+- `channels logs` - 显示渠道日志
+
+**gateway 方法:**
+- `chat.history` - 获取会话聊天历史
+- `chat.abort` - 中止活跃的聊天运行
+- `chat.send` - 发送消息到 Agent
+- `chat.inject` - 注入消息到聊天历史
+- `tts.status` - 获取 TTS 配置状态
+- `tts.providers` - 列出可用 TTS 提供者
+- `tts.enable/disable` - 启用/禁用 TTS
+- `tts.convert` - 文本转语音
+- `tts.setProvider` - 设置 TTS 提供者
+- `wizard.start/next/cancel/status` - 向导会话管理
+
+### 编译状态
+
+✅ 全部编译通过
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| 新增 Go 文件 | 12 |
+| 新增代码行数 | ~1,400 |
+| Go 总文件数 | **736** |
+
+### 后续工作
+
+## 第 83 轮工作记录 (2026-02-27)
+
+### 完成工作
+
+本轮专注于实现 gateway session-utils 和 commands 缺失文件。
+
+### 新增文件
+
+#### gateway 模块
+| 文件 | 行数 | 功能描述 |
+|------|------|----------|
+| `session_utils.go` | 512 | 会话条目管理、会话文件读写、会话列表 |
+| `session_utils_fs.go` | 387 | 会话文件系统操作、消息读取、标题提取 |
+
+#### commands 模块
+| 文件 | 行数 | 功能描述 |
+|------|------|----------|
+| `signal_install.go` | 439 | signal-cli 安装命令、GitHub release 下载、归档解压 |
+| `reset.go` | 220 | 重置命令、配置/凭证/会话清理 |
+
+### 功能详情
+
+**session_utils.go**:
+- `SessionEntry` - 会话条目类型定义
+- `LoadSessionEntry`/`SaveSessionEntry` - 会话文件读写
+- `ListSessions` - 列出所有会话
+- `ResolveSessionModelRef` - 解析会话模型引用
+- `ReadSessionMessages`/`AppendSessionMessage` - 消息读写
+
+**session_utils_fs.go**:
+- `ReadSessionMessagesFromTranscript` - 从转录文件读取消息
+- `ReadSessionTitleFields` - 读取会话标题字段（带缓存）
+- `ArchiveSessionTranscripts` - 归档会话转录
+- `CapArrayByJsonBytesGeneric` - 按 JSON 字节大小限制数组
+
+**signal_install.go**:
+- `InstallSignalCli` - 安装 signal-cli
+- `FetchLatestRelease` - 从 GitHub API 获取最新发布
+- `PickAsset` - 根据平台选择合适的发布资源
+- `ExtractTarGz`/`ExtractZip` - 归档解压
+
+**reset.go**:
+- `ResetCommand` - 重置命令实现
+- 支持三种重置范围: config、config+creds+sessions、full
+- 支持 dry-run 模式
+
+### 编译状态
+
+✅ 全部编译通过
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| 新增 Go 文件 | 4 |
+| 新增代码行数 | ~1,560 |
+| Go 总文件数 | **740** |
+| commands Go 文件 | 63 |
+| gateway Go 文件 | 10 |
+
+### 后续工作
+
+1. **commands 模块扩展** - 实现 configure、onboard 完整流程
+2. **gateway/server 扩展** - 实现 server-http、tools-invoke-http
+3. **agents 模块完善** - 实现缺失的 agent 工具
+
+*最后更新: 2026-02-27*
