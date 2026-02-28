@@ -1751,3 +1751,237 @@ ok  github.com/openclaw/openclaw-go/internal/infra/home
 3. **低优先级**: 补充边界条件测试
 
 *最后更新: 2026-02-28*
+
+
+## 第 99 轮工作记录 (2026-02-28)
+
+### 完成工作
+
+本轮专注于解决启动问题，创建了独立的 gateway 和 tui 命令入口。
+
+### 新增文件
+
+| 文件 | 行数 | 功能描述 |
+|------|------|----------|
+| `cmd/gateway/main.go` | 28 | Gateway 服务启动入口 |
+| `cmd/tui/main.go` | 137 | 简易 TUI WebSocket 客户端 |
+
+### 修复的问题
+
+| 文件 | 问题 | 修复内容 |
+|------|------|----------|
+| `autoreply/model_directive.go` | Go RE2 不支持 lookahead `(?=)` | 重写正则表达式，改用边界字符匹配 |
+| `autoreply/tokens.go` | 同上 | 移除 lookahead 语法 |
+| `autoreply/reply/directives.go` | 同上 | 移除 lookahead 语法 |
+| `agents/pi_embedded_utils.go` | 同上 | 移除 lookahead 语法 |
+| `gateway/methods/tools.go` | `boolPtr` 未定义 | 添加本地 `boolPtr` 辅助函数 |
+
+### 发现的关键缺失功能
+
+在测试 Gateway + TUI 连接时，发现以下核心功能尚未实现：
+
+#### 1. chat.send 方法只是 Stub
+
+**Go 版本当前实现** (`gateway/methods/chat_methods.go`):
+```go
+func handleChatSend(ctx context.Context, hctx *HandlerContext) {
+    // 只返回确认，不执行任何 Agent 逻辑
+    hctx.Respond(true, map[string]interface{}{
+        "sent":       true,
+        "sessionKey": sessionKey,
+        "ts":         time.Now().UnixMilli(),
+    }, nil)
+}
+```
+
+**TypeScript 原版实现** (`gateway/server-methods/chat.ts`):
+- 加载会话配置和 Agent 身份
+- 解析消息和附件
+- 调用 AI Provider (OpenAI/Anthropic/Gemini 等)
+- 流式推送 assistant 事件到 WebSocket
+- 处理工具调用和回复
+
+#### 2. Agent 运行器未集成
+
+**缺失的关键模块：**
+
+| 模块 | TypeScript 文件 | Go 文件 | 状态 |
+|------|----------------|---------|------|
+| Agent 执行引擎 | `agents/pi-embedded-runner/*.ts` | `agents/piembeddedrunner/*.go` | 框架存在，核心逻辑未实现 |
+| AI Provider 调用 | `agents/provider-*.ts` | 缺失 | ❌ 未实现 |
+| 消息流处理 | `gateway/server-node-events.ts` | 缺失 | ❌ 未实现 |
+| 事件广播 | `gateway/server-ws-*.ts` | 部分实现 | ⚠️ 部分完成 |
+
+#### 3. 缺失的 AI Provider 实现
+
+需要在 Go 中实现以下 Provider 客户端：
+
+- [ ] OpenAI API 客户端
+- [ ] Anthropic Claude API 客户端
+- [ ] Google Gemini API 客户端
+- [ ] OpenRouter API 客户端
+- [ ] 本地模型支持 (Ollama 等)
+
+### 启动方式
+
+**启动 Gateway:**
+```bash
+cd /home/uii/code/openclaw-go/openclaw-go
+./gateway
+# 或编译后:
+go run ./cmd/gateway
+```
+
+**连接 TUI 客户端:**
+```bash
+./openclaw-tui --url ws://localhost:19001/ws
+```
+
+### 当前功能状态
+
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| Gateway 服务启动 | ✅ 完成 | 监听 WebSocket 端口 |
+| WebSocket 连接 | ✅ 完成 | 客户端可以连接 |
+| Hello 握手 | ✅ 完成 | 返回 hello-ok |
+| chat.send 确认 | ✅ 完成 | 返回 `{sent: true}` |
+| Agent 消息处理 | ❌ 未实现 | 需要 AI Provider 集成 |
+| 流式响应推送 | ❌ 未实现 | 需要 SSE/WebSocket 事件流 |
+| 工具调用执行 | ❌ 未实现 | 需要 bash/web 等工具实现 |
+
+### 编译状态
+
+✅ 全部编译通过
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| Go 文件 | **783** |
+| 新增入口文件 | 2 |
+| 修复正则兼容问题 | 4 处 |
+
+### 后续工作优先级
+
+**P0 - 核心功能（阻塞使用）：**
+1. 实现 `chat.send` 完整逻辑
+   - 加载会话和 Agent 配置
+   - 调用 AI Provider API
+   - 流式返回响应
+
+2. 实现 AI Provider 集成
+   - OpenAI API 客户端
+   - Anthropic API 客户端
+   - 支持流式响应 (SSE)
+
+**P1 - 重要功能：**
+1. 实现事件广播机制
+   - `assistant.text` 事件
+   - `tool.call` 事件
+   - `tool.result` 事件
+
+2. 实现基础工具
+   - Bash 执行
+   - 文件读写
+   - Web 请求
+
+**P2 - 增强功能：**
+1. 实现更多 AI Provider
+2. 添加错误处理和重试
+3. 完善日志和诊断
+
+### 对比 TypeScript 原版
+
+启动 TypeScript 原版查看完整功能：
+```bash
+cd /home/uii/code/openclaw
+npm install
+npm run dev     # 启动 Gateway
+npm run tui     # 启动 TUI
+```
+
+*最后更新: 2026-02-28*
+
+## 第 99 轮工作记录 (2026-02-28)
+
+### 完成工作
+
+本轮专注于代码质量优化，清理了大量重复函数实现。
+
+### 清理的重复函数
+
+| 函数类型 | 清理数量 | 替换为 |
+|----------|----------|--------|
+| `boolPtr()` | 4处 | `utils.BoolPtr()` |
+| `ptrString()` | 6处 | `utils.StrPtr()` |
+| `stripAnsi()` | 2处 | `utils.StripAnsi()` |
+| `randomString()` | 6处 | `utils.RandomAlphanumeric()` |
+| `max()` | 4处 | Go 内置 `max()` (1.21+) |
+| `itoa()` | 4处 | `strconv.Itoa` |
+
+### 修改的文件
+
+**boolPtr 清理:**
+- `internal/channels/slack/monitor/channel_config.go`
+- `internal/wizard/onboarding_completion.go`
+- `internal/commands/status_command.go`
+- `internal/gateway/methods/tools.go`
+
+**ptrString 清理:**
+- `internal/tui/formatters.go`
+- `internal/tts/core.go`
+- `internal/tts/tts.go`
+- `internal/infra/provider_usage_load.go`
+- `internal/agents/bash_tools_exec_host_gateway.go`
+- `internal/agents/bash_tools_exec_host_node.go`
+- `internal/gateway/methods/chat.go`
+
+**stripAnsi 清理:**
+- `internal/tui/formatters.go`
+- `internal/wizard/clack_prompter.go`
+
+**randomString 清理:**
+- `internal/cron/store.go`
+- `internal/process/supervisor/supervisor.go`
+- `internal/browser/control_auth.go`
+- `internal/browser/proxy_files.go`
+- `internal/gateway/methods/chat_transcript_inject.go`
+- `internal/gateway/methods/connect.go`
+- `internal/gateway/methods/nodes.go`
+
+**max 清理:**
+- `internal/channels/slack/stream_mode.go`
+- `internal/tui/waiting.go`
+- `internal/markdown/ir.go`
+- `internal/infra/fixed_window_rate_limit.go`
+
+**itoa 清理:**
+- `internal/tui/formatters.go`
+- `internal/tui/local_shell.go`
+- `internal/commands/onboard_noninteractive/local.go`
+- `internal/signal/accounts.go`
+- `internal/infra/tmp_openclaw_dir.go`
+
+### 重要修复
+
+发现并修复了 `randomString()` 实现的严重 bug：原实现使用 `i % len(charset)` 而非随机选择字符，导致生成的字符串可预测。已替换为 `utils.RandomAlphanumeric()` 使用加密安全的随机数生成器。
+
+### 编译状态
+
+✅ 全部编译通过
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| 清理重复函数 | 26 处 |
+| 修改文件 | 25+ |
+| 删除代码行数 | ~200 行 |
+
+### 后续工作
+
+1. **高优先级**: 实现 config 模块核心文件
+2. **中优先级**: 补充 cli 模块实现
+3. **低优先级**: 继续清理其他重复函数
+
+*最后更新: 2026-02-28*
