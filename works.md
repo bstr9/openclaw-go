@@ -2192,10 +2192,65 @@ ok  github.com/openclaw/openclaw-go/internal/shared
 | 清理重复函数 | 3 处 |
 | 识别未使用代码 | 177 处 |
 
+## 第 102 轮工作记录 (2026-02-28)
+
+### 完成工作
+
+本轮专注于从 TypeScript 原版移植测试用例并修复发现的功能缺陷。
+
+### 修复的问题
+
+| 文件 | 问题 | 修复内容 |
+|------|------|----------|
+| `cron/schedule.go` | 不支持 6-field cron 表达式 | 添加 6-field (second minute hour day month weekday) 支持 |
+| `infra/retry.go` | `ResolveRetryConfig` 对 Attempts=0 处理不正确 | 确保 attempts 至少为 1 |
+
+### 新增测试文件
+
+| 文件 | 行数 | 测试数量 | 功能描述 |
+|------|------|----------|----------|
+| `infra/retry_test.go` | ~370 | 18 | 重试逻辑测试 - 返回成功、重试后成功、耗尽重试、ShouldRetry、OnRetry、RetryAfterMs 等 |
+| `infra/dotenv/dotenv_test.go` | ~350 | 10 | 环境变量加载测试 - CWD 优先级、shell 变量保护、fallback 加载、引号处理、注释处理等 |
+
+### 测试结果
+
+**全部测试通过:**
+```
+ok  github.com/openclaw/openclaw-go/internal/cron
+ok  github.com/openclaw/openclaw-go/internal/infra
+ok  github.com/openclaw/openclaw-go/internal/infra/dotenv
+ok  github.com/openclaw/openclaw-go/internal/infra/home
+ok  github.com/openclaw/openclaw-go/internal/pairing
+ok  github.com/openclaw/openclaw-go/internal/sessions
+ok  github.com/openclaw/openclaw-go/internal/shared
+ok  github.com/openclaw/openclaw-go/internal/utils
+```
+
+### 测试覆盖对比
+
+| 模块 | 原版测试文件 | Go 测试文件 | 新增测试 |
+|------|-------------|-------------|---------|
+| cron | 1 | 2 | 已完成 |
+| infra | 100+ | 6 | retry, dotenv, env, home, securerandom |
+| formattime | 1 | 2 | 已完成 |
+| pairing | 2 | 2 | 已完成 |
+| sessions | 1 | 2 | 已完成 |
+| shared | 3 | 3 | 已完成 |
+| utils | 1 | 2 | 已完成 |
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| 新增测试文件 | 2 |
+| 新增测试代码 | ~720 行 |
+| 新增测试用例 | 28 个 |
+| 修复功能缺陷 | 2 处 |
+
 ### 后续工作
 
-1. **最高优先级**: 实现 config 模块核心文件（zod-schema、validation、defaults）
-2. **高优先级**: 继续删除未使用代码（116 个函数）
-3. **中优先级**: 统一 `ResolveGatewayPort` 重复实现
+1. **高优先级**: 继续移植更多模块测试（gateway、channels、agents）
+2. **中优先级**: 为 infra/backoff、infra/net 等子目录添加测试
+3. **低优先级**: 补充边界条件和错误处理测试
 
 *最后更新: 2026-02-28*
