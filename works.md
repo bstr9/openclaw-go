@@ -2501,3 +2501,98 @@ ok  github.com/openclaw/openclaw-go/internal/utils
 
 *最后更新: 2026-03-01*
 
+### 后续工作
+
+1. **高优先级**: 实现 config 模块核心文件（仅 4% 完成度）
+2. **中优先级**: 补充 cli 模块实现（仅 11% 完成度）
+3. **中优先级**: 完成 gateway/server 相关文件
+4. **低优先级**: 继续清理 parseInt 等重复函数
+
+*最后更新: 2026-03-01*
+
+## 第 99 轮工作记录 (2026-03-01)
+
+### 完成工作
+
+本轮专注于从 openclaw TypeScript 原版移植测试用例到 Go 版本，确保功能/接口一致。
+
+### 新增测试文件
+
+| 文件 | 行数 | 测试数量 | 功能描述 |
+|------|------|----------|----------|
+| `infra/archive/archive_test.go` | 564 | 17 | 归档提取测试 - tar/zip 提取、路径遍历防护、大小限制等 |
+
+### 测试覆盖
+
+**archive 模块测试（17 个测试）：**
+- `TestResolveArchiveKind` - 归档类型检测
+- `TestExtractTar_Basic` - 基本 tar 提取
+- `TestExtractTar_Gzip` - gzip 压缩 tar 提取
+- `TestExtractTar_PathTraversal` - 路径遍历攻击防护
+- `TestExtractTar_SizeLimit` - 提取大小限制
+- `TestExtractZip_Basic` - 基本 zip 提取
+- `TestExtractZip_PathTraversal` - zip 路径遍历防护
+- `TestExtractZip_SizeLimit` - zip 大小限制
+- `TestExtractZip_ArchiveSizeLimit` - 归档大小限制
+- `TestResolvePackedRootDir_*` - 根目录解析
+- `TestExtractOptions_StripComponents` - 组件剥离
+- `TestExtractTar_DestinationNotDirectory` - 目标非目录检查
+- `TestResolveExtractLimits_*` - 限制配置
+
+### 修复的问题
+
+| 文件 | 问题 | 修复内容 |
+|------|------|----------|
+| `infra/archive/archive.go` | 非gzip tar 无法解析 | 添加 bufio.Reader 预读检测 gzip 魔数，避免消耗 reader |
+| `infra/archive/archive_test.go` | 测试设置问题 | 修正 `TestExtractTar_SizeLimit` 使用 ResolveExtractLimits |
+| `infra/env_test.go` | undefined: parseBooleanValue | 改用 `IsTruthyEnvValue` 函数 |
+
+### 测试结果
+
+**全部测试通过: 39+ 个**
+```
+ok  github.com/openclaw/openclaw-go/internal/infra
+ok  github.com/openclaw/openclaw-go/internal/infra/archive
+ok  github.com/openclaw/openclaw-go/internal/infra/archivepath
+ok  github.com/openclaw/openclaw-go/internal/infra/backoff
+ok  github.com/openclaw/openclaw-go/internal/infra/dotenv
+ok  github.com/openclaw/openclaw-go/internal/infra/home
+ok  github.com/openclaw/openclaw-go/internal/infra/securerandom
+ok  github.com/openclaw/openclaw-go/internal/pairing
+ok  github.com/openclaw/openclaw-go/internal/sessions
+ok  github.com/openclaw/openclaw-go/internal/shared
+ok  github.com/openclaw/openclaw-go/internal/utils
+ok  github.com/openclaw/openclaw-go/internal/config
+ok  github.com/openclaw/openclaw-go/internal/cron
+ok  github.com/openclaw/openclaw-go/internal/formattime
+```
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| 新增测试文件 | 1 |
+| 新增测试代码 | ~564 行 |
+| 新增测试用例 | 17 个 |
+| 修复 Bug | 2 处 |
+| Go 测试文件总数 | 23 |
+
+### TS vs Go 测试覆盖对比
+
+| 模块 | TS 测试文件 | Go 测试文件 | 覆盖率 |
+|------|------------|-------------|--------|
+| infra/ | 97 | 11 | ~11% |
+| agents/ | 241 | 0 | 0% |
+| gateway/ | 77 | 0 | 0% |
+| commands/ | 83 | 0 | 0% |
+| config/ | 65 | 1 | ~2% |
+| cron/ | 33 | 2 | ~6% |
+
+### 待补充的测试
+
+1. **高优先级**: agents 模块测试（241 个 TS 测试）
+2. **高优先级**: gateway 模块测试（77 个 TS 测试）
+3. **中优先级**: commands 模块测试（83 个 TS 测试）
+4. **低优先级**: 继续补充 infra 模块测试
+
+*最后更新: 2026-03-01*
