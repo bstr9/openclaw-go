@@ -802,3 +802,79 @@ Agent Client Protocol 集成，用于 IDE 客户端：
 3. 实现缺失的移植功能
 
 *最后更新: 2026-02-28*
+
+## 第 85 轮工作记录 (2026-02-28)
+
+### 完成工作
+
+本轮专注于代码清理和代码质量优化，统一重复函数实现。
+
+### 统一重复代码
+
+**FormatTimeAgo 统一:**
+| 原位置 | 修改 |
+|--------|------|
+| `autoreply/status.go` | 删除本地实现，改用 `formattime.FormatTimeAgoSimple` |
+| `tui/status_summary.go` | 删除本地实现，改用 `formattime.FormatTimeAgoSimple` |
+| `commands/status_command.go` | 改用 `formattime.FormatTimeAgoSimple` |
+| `formattime/relative.go` | 新增 `FormatTimeAgoSimple` 便捷函数 |
+
+**FormatDuration 统一:**
+| 原位置 | 状态 |
+|--------|------|
+| `formattime/duration.go` | 主实现，新增 `FormatDurationFromMs`, `FormatDurationFromMsPrecise` |
+| `channels/telegram/send.go` | 保留本地实现（签名不同：`time.Duration` vs `int64`）|
+| `commands/status_format.go` | 保留本地实现（格式略有不同）|
+| `shared/subagents_format.go` | 保留本地实现（内部使用）|
+| `agents/subagent_announce.go` | 保留本地实现（内部使用）|
+
+### 模块对比分析
+
+通过对比 TypeScript 原版和 Go 版本，发现以下情况：
+
+**TS 有但 Go 缺失的模块:**
+- `plugin-sdk` (28文件) - 插件开发 SDK
+- `test-utils` (26文件) - 测试工具
+- `media` (30文件) - 媒体处理核心
+- `pairing` (7文件) - 设备配对系统
+- `compat` (1文件) - 兼容层
+
+**文件数量差距大的模块:**
+| 模块 | TS文件 | Go文件 | 完成度 |
+|------|--------|--------|--------|
+| config | 191 | 4 | 2% |
+| cli | 254 | 14 | 5% |
+| daemon | 40 | 3 | 7% |
+| logging | 24 | 1 | 4% |
+| memory | 84 | 3 | 4% |
+| cron | 71 | 5 | 7% |
+| web | 80 | 3 | 4% |
+| agents | 649 | 132 | 20% |
+| gateway | 282 | 63 | 22% |
+| commands | 304 | 83 | 27% |
+
+### 识别的潜在问题
+
+1. **TODO/FIXME 标记** - 约 30 处待完成实现
+2. **Panic 语句** - 需要替换为错误处理
+3. **Stub 实现** - 部分 Slack 监控功能未完成
+
+### 编译状态
+
+✅ 全部编译通过
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| Go 文件 | **739** |
+| 修改文件 | 4 |
+| 删除重复函数 | 3 |
+
+### 后续工作
+
+1. **高优先级**: 实现 `pairing` 模块
+2. **中优先级**: 补充 `config`、`cli` 模块实现
+3. **低优先级**: 替换 panic 为错误处理
+
+*最后更新: 2026-02-28*
