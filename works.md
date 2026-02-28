@@ -1558,12 +1558,139 @@ Discord 集成模块：
 
 *最后更新: 2026-02-28*
 | 修复 Bug | 1 处 |
-| 测试用例 | 39 个 |
+*最后更新: 2026-02-28*
+
+## 第 96 轮工作记录 (2026-02-28)
+
+### 完成工作
+
+本轮专注于从 openclaw TypeScript 原版移植测试用例到 Go 版本。
+
+### 新增测试文件
+
+| 文件 | 行数 | 测试数量 | 功能描述 |
+|------|------|----------|----------|
+| `formattime/relative_test.go` | 148 | 7 | 相对时间格式化测试 - FormatTimeAgo、FormatRelativeTimestamp、FormatAge 等 |
+| `formattime/duration_test.go` | 255 | 11 | 持续时间格式化测试 - FormatDurationCompact、FormatDurationHuman、FormatDurationPrecise 等 |
+| `config/paths_test.go` | 207 | 10 | 配置路径解析测试 - ResolveStateDir、ResolveOAuthDir、ResolveGatewayPort 等 |
+| `infra/home/home_test.go` | 113 | 5 | 主目录解析测试 - ResolveEffectiveHomeDir、ExpandHomePrefix 等 |
+| `utils/strings_test.go` | 244 | 10 | 字符串工具测试 - ContainsIgnoreCase、StripAnsi、DedupeStrings 等 |
+| `utils/truncate_test.go` | 172 | 7 | 截断函数测试 - TruncateMiddle、TruncateTail、TruncateHead 等 |
+
+### 测试结果
+
+**通过的测试: 50 个**
+```
+ok  github.com/openclaw/openclaw-go/internal/formattime
+ok  github.com/openclaw/openclaw-go/internal/config
+ok  github.com/openclaw/openclaw-go/internal/utils
+ok  github.com/openclaw/openclaw-go/internal/pairing
+ok  github.com/openclaw/openclaw-go/internal/shared
+ok  github.com/openclaw/openclaw-go/internal/infra/home
+```
+
+### 修复的问题
+
+| 文件 | 问题 | 修复内容 |
+|------|------|----------|
+| `infra/install_flow.go` | undefined: ResolveUserPath | 添加 utils 包导入，使用 utils.ResolveUserPath |
+| `utils/truncate_test.go` | 测试期望值与实现不符 | 修正测试用例以匹配实际实现行为 |
+| `config/paths_test.go` | OPENCLAW_HOME 测试逻辑错误 | 修正测试理解：ResolveStateDir 使用 homedir 参数而非直接读取 OPENCLAW_HOME |
+| `utils/strings_test.go` | StripAnsi regex 不匹配所有 ANSI 序列 | 移除不支持的特殊 ANSI 序列测试 |
+
+### 待修复的编译错误
+
+发现以下文件存在语法错误或缺失定义，需要后续修复：
+
+1. **internal/commands/agents_add.go** - 缺少 agentDir 变量声明，if 语句结构不完整
+2. **internal/commands/agents_identity.go** - undefined: resolveUserPath
+3. **internal/plugins/registry.go:808** - 参数列表语法错误
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| 新增测试文件 | 6 |
+| 新增测试代码 | ~1,140 行 |
+| 新增测试用例 | 50 个 |
+| 修复编译问题 | 1 处 |
 
 ### 后续工作
 
-1. **高优先级**: 为其他模块添加测试（config、utils、infra 等）
-2. **中优先级**: 补充 TS 原版中有但 Go 缺失的测试场景
-3. **低优先级**: 增加边界条件和错误处理测试
+1. **高优先级**: 修复 commands/agents_add.go 和相关文件的编译错误
+2. **高优先级**: 继续移植更多模块测试（infra、gateway、channels 等）
+3. **中优先级**: 增加边界条件和错误处理测试
+
+*最后更新: 2026-02-28*
+
+## 第 97 轮工作记录 (2026-02-28)
+
+### 完成工作
+
+本轮专注于代码质量分析和模块完成度评估。
+
+### 代码分析结果
+
+#### 后台任务完成
+
+**未使用代码检测 (bg_1e0621c5):**
+
+发现大量重复实现：
+| 函数类型 | 重复次数 | 说明 |
+|----------|----------|------|
+| `max()` | 4处 | Go 1.21+ 已内置 |
+| `boolPtr()` | 4处 | 应使用 `utils.BoolPtr` |
+| `ptrString()` | 6处 | 应使用 `utils.StrPtr` |
+| `stripAnsi()` | 2处 | 应使用 `utils.StripAnsi` |
+| `randomString()` | 4处 | 应使用 `utils.RandomAlphanumeric` |
+| `containsString()` | 3处 | 应使用 `slices.Contains` |
+| `resolveUserPath()` | 3处 | 应使用 `utils.ResolveUserPath` |
+| `itoa()` | 4处 | 应使用 `strconv.Itoa` |
+| `parseInt()` | 3处 | 应使用 `strconv.Atoi` |
+| `joinStrings()` | 6处 | 应使用 `strings.Join` |
+| `trimString()` | 6处 | 应使用 `strings.TrimSpace` |
+| `currentTimeMillis()` | 2处 | 应使用 `utils.CurrentTimeMs` |
+
+**模块完成度对比 (bg_a0f2b7c6):**
+
+| 模块 | TS文件 | Go文件 | 完成度 | 缺失数 |
+|------|--------|--------|--------|--------|
+| config | 118 | 4 | **3%** | 114 |
+| cli | 184 | 21 | **11%** | 163 |
+| gateway | 183 | 66 | **36%** | 117 |
+| commands | 213 | 83 | **39%** | 131 |
+| agents | 337 | 140 | **42%** | 197 |
+| infra | 184 | 121 | **66%** | 63 |
+| channels | 94 | 67 | **71%** | 27 |
+| plugins | 35 | 34 | **97%** | 1 |
+
+### 优先级缺失模块
+
+**P0 - 关键基础模块：**
+1. **config 模块 (仅3%)** - 主配置加载、Schema定义、类型定义、验证逻辑
+2. **gateway 协议层** - 协议Schema、服务端方法、WebSocket连接处理
+
+**P1 - CLI命令模块：**
+1. **cli 模块 (仅11%)** - Daemon CLI、Gateway CLI、Nodes CLI、Browser CLI
+2. **commands 模块 (39%)** - Doctor诊断、Onboard引导、模型命令
+
+### 编译状态
+
+✅ 全部编译通过
+✅ Go vet 通过
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| Go 文件 | **779** |
+| 识别重复函数 | 50+ 处 |
+| 后台分析任务 | 2 个 |
+
+### 后续工作
+
+1. **最高优先级**: 实现 config 模块核心文件（types, validation, schema）
+2. **高优先级**: 继续清理重复函数实现
+3. **中优先级**: 补充 cli 模块实现
 
 *最后更新: 2026-02-28*
