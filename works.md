@@ -2432,3 +2432,72 @@ ok  github.com/openclaw/openclaw-go/internal/utils
 3. **低优先级**: 补充更多边界条件测试
 
 *最后更新: 2026-02-28"
+
+## 第 106 轮工作记录 (2026-03-01)
+
+### 完成工作
+
+本轮专注于代码质量优化，清理了大量重复函数实现。
+
+### 清理的重复函数
+
+| 函数类型 | 清理数量 | 替换为 |
+|----------|----------|--------|
+| `strPtr()` | 2处 | `utils.StrPtr()` |
+| `strPtrNonEmpty()` | 1处 | `utils.StrPtrNonEmpty()` (新增) |
+| `parseBooleanValue()` | 2处 | `utils.ParseBooleanValue()` (新增) |
+| `boolPtrOr()` | 1处 | `utils.BoolPtrOr()` |
+| `boolPtr()` | 1处 | 直接调用 `utils.BoolPtr()` |
+| `truncateMiddle()` | 1处 | `utils.TruncateMiddle()` |
+| `formatDurationCompact()` | 1处 | `formattime.FormatDurationCompactInt64()` (新增) |
+| `generateId()/generateID()` | 2处 | `utils.GenerateShortID()` |
+
+### 新增工具函数
+
+| 文件 | 函数 | 说明 |
+|------|------|------|
+| `utils/ptr.go` | `StrPtrNonEmpty()` | 空字符串返回 nil 的指针函数 |
+| `utils/boolean.go` | `ParseBooleanValue()` | 与 TS 原版一致的布尔解析 |
+| `utils/boolean.go` | `IsTruthyEnvValue()` | 环境变量真值检查 |
+| `formattime/duration.go` | `FormatDurationCompactInt64()` | int64 参数的便捷版本 |
+
+### 修改的文件
+
+| 文件 | 修改内容 |
+|------|----------|
+| `internal/utils/ptr.go` | 新增 `StrPtrNonEmpty()` |
+| `internal/utils/boolean.go` | 新文件，布尔解析工具 |
+| `internal/formattime/duration.go` | 新增 `FormatDurationCompactInt64()` |
+| `internal/infra/env.go` | 使用 `utils.IsTruthyEnvValue()` |
+| `internal/tts/core.go` | 使用 `utils.ParseBooleanValue()` |
+| `internal/agents/auth_profiles.go` | 使用 `utils.StrPtr()` |
+| `internal/commands/onboard_noninteractive/remote.go` | 使用 `utils.StrPtr/StrPtrNonEmpty()` |
+| `internal/acp/session_mapper.go` | 使用 `utils.BoolPtrOr()` |
+| `internal/gateway/methods/tools.go` | 直接使用 `utils.BoolPtr()` |
+| `internal/agents/tools/process.go` | 使用 `utils/formattime` 统一函数 |
+| `internal/channels/line/plugin.go` | 使用 `utils.GenerateShortID()` |
+| `internal/gateway/methods/openresponses.go` | 使用 `utils.GenerateShortID()` |
+
+### 编译状态
+
+✅ 全部编译通过
+✅ 现有测试通过
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| 新增文件 | 1 (`utils/boolean.go`) |
+| 修改文件 | 11 |
+| 删除重复函数 | 10 处 |
+| 删除代码行数 | ~80 行 |
+
+### 后续工作
+
+1. **高优先级**: 实现 config 模块核心文件（仅 4% 完成度）
+2. **中优先级**: 补充 cli 模块实现（仅 11% 完成度）
+3. **中优先级**: 完成 gateway/server 相关文件
+4. **低优先级**: 继续清理 parseInt 等重复函数
+
+*最后更新: 2026-03-01*
+
