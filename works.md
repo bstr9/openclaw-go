@@ -1694,3 +1694,60 @@ ok  github.com/openclaw/openclaw-go/internal/infra/home
 3. **中优先级**: 补充 cli 模块实现
 
 *最后更新: 2026-02-28*
+
+## 第 98 轮工作记录 (2026-02-28)
+
+### 完成工作
+
+本轮专注于从 openclaw TypeScript 原版移植测试用例并修复发现的 bug。
+
+### 新增测试文件
+
+| 文件 | 行数 | 测试数量 | 功能描述 |
+|------|------|----------|----------|
+| `infra/securerandom/securerandom_test.go` | 199 | 8 | 安全随机生成测试 - GenerateSecureUUID、GenerateSecureToken、GenerateSecureHex 等 |
+| `infra/env_test.go` | 99 | 3 | 环境变量工具测试 - IsTruthyEnvValue、NormalizeZaiEnv、parseBooleanValue |
+
+### 修复的 Bug
+
+| 文件 | 问题 | 修复内容 |
+|------|------|----------|
+| `infra/securerandom/securerandom.go` | `base64.URLEncoding` 产生 `=` 填充字符 | 改为 `base64.RawURLEncoding`，与 Node.js `base64url` 一致 |
+| `tui/formatters.go` | `stripAnsi` 函数未定义 | 改用 `utils.StripAnsi` |
+| `channels/slack/monitor/channel_config.go` | package 声明顺序错误 | 修正 package 和 import 语句顺序 |
+| `autoreply/model_directive.go` | 缺少 `}` 导致语法错误 | 重写文件修复语法问题 |
+
+### 测试结果
+
+**全部测试通过:**
+```
+ok  github.com/openclaw/openclaw-go/internal/infra/securerandom
+ok  github.com/openclaw/openclaw-go/internal/infra
+ok  github.com/openclaw/openclaw-go/internal/formattime
+ok  github.com/openclaw/openclaw-go/internal/config
+ok  github.com/openclaw/openclaw-go/internal/pairing
+ok  github.com/openclaw/openclaw-go/internal/shared
+ok  github.com/openclaw/openclaw-go/internal/utils
+ok  github.com/openclaw/openclaw-go/internal/infra/home
+```
+
+### 编译状态
+
+✅ 全部编译通过
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| 新增测试文件 | 2 |
+| 新增测试代码 | ~300 行 |
+| 新增测试用例 | 11 个 |
+| 修复 Bug | 4 处 |
+
+### 后续工作
+
+1. **高优先级**: 继续移植更多模块测试（infra/backoff、infra/dotenv、infra/retry 等）
+2. **中优先级**: 为 gateway、channels 模块添加测试
+3. **低优先级**: 补充边界条件测试
+
+*最后更新: 2026-02-28*
