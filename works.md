@@ -2665,6 +2665,97 @@ ok  github.com/openclaw/openclaw-go/internal/formattime
 1. **高优先级**: 实现 config 模块核心文件 (validation, defaults)
 2. **中优先级**: 补充 cli 模块实现 (仅 11% 完成度)
 3. **低优先级**: 继续清理剩余未使用代码
+*最后更新: 2026-03-01*
+
+## 第 108 轮工作记录 (2026-03-01)
+
+### 完成工作
+
+本轮专注于从 openclaw TypeScript 原版移植测试用例到 Go 版本，确保功能/接口一致性。
+
+### 新增测试文件
+
+| 文件 | 行数 | 测试数量 | 功能描述 |
+|------|------|----------|----------|
+| `pairing/messages_test.go` | 204 | 6 | 配对消息测试 - BuildPairingReply、BuildPairingApprovedReply、BuildPairingDeniedReply 等 |
+| `shared/avatar_policy_test.go` | 223 | 8 | 头像策略测试 - IsWorkspaceRelativeAvatarPath、IsPathWithinRoot、LooksLikeAvatarPath 等 |
+| `shared/pid_alive_test.go` | 117 | 5 | PID 存活检测测试 - IsPIDAlive、IsPIDAlivePlatform、IsZombieProcess |
+| `shared/operator_scope_compat_test.go` | 310 | 10 | 操作符作用域兼容测试 - RoleScopesAllow 各种场景 |
+
+### 测试结果
+
+**所有可用测试通过:**
+```
+ok  github.com/openclaw/openclaw-go/internal/shared
+ok  github.com/openclaw/openclaw-go/internal/cron
+ok  github.com/openclaw/openclaw-go/internal/pairing
+ok  github.com/openclaw/openclaw-go/internal/formattime
+ok  github.com/openclaw/openclaw-go/internal/utils
+ok  github.com/openclaw/openclaw-go/internal/sessions
+ok  github.com/openclaw/openclaw-go/internal/infra/archive
+ok  github.com/openclaw/openclaw-go/internal/infra/archivepath
+ok  github.com/openclaw/openclaw-go/internal/infra/backoff
+ok  github.com/openclaw/openclaw-go/internal/infra/dotenv
+ok  github.com/openclaw/openclaw-go/internal/infra/home
+ok  github.com/openclaw/openclaw-go/internal/infra/securerandom
+```
+
+### 修复的问题
+
+| 文件 | 问题 | 修复内容 |
+|------|------|----------|
+| `logger/logger.go` | 重复函数声明 | 删除重复的 `isRollingPath` 函数声明 |
+| `agents/tools/memory.go` | 未使用导入 | 删除 `fmt`、`strings` 未使用导入 |
+| `agents/pi_embedded_subscribe.go` | 未使用导入 | 删除 `strings` 未使用导入 |
+| `config/defaults.go` | math.IsFinite 不存在 | 改用 `!math.IsInf(v, 0)` 替代 |
+| `config/types.go` | 缺少类型定义 | 添加 `MessagesConfig` 字段到 `OpenClawConfig`，添加 `SubagentsConfig` 类型，添加 `MaxConcurrent` 字段到 `AgentDefaults` |
+
+### 待修复的编译错误
+
+以下文件存在编译错误，需要后续修复：
+
+1. **internal/config/defaults.go** - 缺少 `LoggingConfig.RedactSensitive`、`AgentDefaults.Models` 等字段
+2. **internal/infra/retry.go** (及依赖) - 环境变量相关测试依赖 config 包，需先修复 config
+
+### 测试覆盖统计
+
+| 模块 | Go 测试文件 | 新增测试用例 |
+|------|-------------|-------------|
+| pairing/ | 3 | +6 |
+| shared/ | 5 | +23 |
+| config/ | 1 | 0 |
+| cron/ | 2 | 0 |
+| infra/ | 11 | 0 |
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| 新增测试文件 | 4 |
+| 新增测试代码 | ~854 行 |
+| 新增测试用例 | 29 个 |
+| Go 测试文件总数 | 26 |
+| 修复编译问题 | 5 处 |
+
+### TS vs Go 测试覆盖对比
+
+| 模块 | TS 测试文件 | Go 测试文件 | 覆盖率 |
+|------|------------|-------------|--------|
+| infra/ | 97 | 11 | ~11% |
+| agents/ | 241 | 0 | 0% |
+| gateway/ | 77 | 0 | 0% |
+| commands/ | 83 | 0 | 0% |
+| config/ | 65 | 1 | ~2% |
+| cron/ | 33 | 2 | ~6% |
+| pairing/ | 3 | 3 | **100%** |
+| shared/ | 10 | 5 | **50%** |
+
+### 后续工作
+
+1. **高优先级**: 修复 config/defaults.go 编译错误
+2. **高优先级**: 继续移植 shared 模块剩余测试（chat_content、node_match 等）
+3. **中优先级**: 移植 infra 模块更多测试
+4. **低优先级**: 移植 agents、gateway、commands 模块测试
 
 *最后更新: 2026-03-01*
 
