@@ -744,3 +744,61 @@ Agent Client Protocol 集成，用于 IDE 客户端：
 3. **agents 模块完善** - 实现缺失的 agent 工具
 
 *最后更新: 2026-02-27*
+
+
+## 第 84 轮工作记录 (2026-02-28)
+
+### 完成工作
+
+本轮专注于代码质量优化，清理重复代码和未使用的实现。
+
+### 删除的重复代码
+
+| 类型 | 文件/目录 | 说明 |
+|------|----------|------|
+| 目录 | `internal/infra/formattime/` | 删除，保留 `internal/formattime/` |
+| 函数 | `tui/gateway_chat.go:ParseAgentSessionKey` | 删除，使用 `sessions.ParseAgentSessionKey` |
+| 类型 | `tui/gateway_chat.go:AgentSessionKeyParsed` | 删除，未使用 |
+| 函数 | `agents/agent.go:ParseAgentSessionKey` | 改为委托给 `sessions.ParseAgentSessionKey` |
+| 类型 | `agents/agent.go:ParsedAgentSessionKey` | 改为类型别名 `sessions.ParsedAgentSessionKey` |
+| 函数 | `routing/session_key.go:ParseAgentSessionKey` | 改为委托给 `sessions.ParseAgentSessionKey` |
+| 类型 | `routing/session_key.go:ParsedAgentSessionKey` | 改为类型别名 `sessions.ParsedAgentSessionKey` |
+
+### 代码统一化
+
+根据 TypeScript 源码结构，统一了以下模块：
+
+1. **ParseAgentSessionKey** - 主实现在 `sessions/session_key_utils.go`，其他模块通过别名或委托使用
+   - `routing/session_key.go` - 从 sessions 重导出（与 TS 源码一致）
+   - `agents/agent.go` - 委托给 sessions 包
+
+2. **formattime 目录** - 统一使用 `internal/formattime/`（与 TS 源码 `src/infra/format-time/` 对应）
+   - 删除了重复的 `internal/infra/formattime/` 目录
+
+### 仍存在的重复函数（待后续处理）
+
+以下函数在多处有相似实现，但内部调用而非导出，需要更谨慎地统一：
+
+| 函数名 | 出现位置 | 说明 |
+|--------|----------|------|
+| `FormatTimeAgo` | autoreply/status.go, tui/status_summary.go, commands/status_format.go, formattime/relative.go | 各有略微不同实现 |
+| `FormatDuration` | 多个文件 | 有不同签名和实现 |
+
+### 编译状态
+
+✅ 全部编译通过
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| Go 文件 | **739** (减少 1 个) |
+| 删除代码行数 | ~70 |
+
+### 后续工作
+
+1. 继续清理重复的 FormatTimeAgo、FormatDuration 函数
+2. 对比 TS 和 Go 模块完成度，找出缺失功能
+3. 实现缺失的移植功能
+
+*最后更新: 2026-02-28*
