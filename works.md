@@ -2380,3 +2380,55 @@ ok  github.com/openclaw/openclaw-go/internal/utils
 3. **低优先级**: 补充更多边界条件测试
 
 *最后更新: 2026-02-28"
+
+## 第 105 轮工作记录 (2026-02-28)
+
+### 完成工作
+
+本轮继续从 TypeScript 原版移植测试用例，并修复发现的问题。
+
+### 新增测试文件
+
+| 文件 | 行数 | 测试数量 | 功能描述 |
+|------|------|----------|----------|
+| `infra/fixed_window_rate_limit_test.go` | ~215 | 7 | 固定窗口限流器测试 - BlocksAfterMax、ExplicitReset、WindowBoundary、MultipleWindows、Concurrent 等 |
+
+### 修复的问题
+
+| 文件 | 问题 | 修复内容 |
+|------|------|----------|
+| `agents/auth_profiles.go` | 未使用的 utils 导入 | 确认 utils.StrPtr 实际被使用，导入正确 |
+
+### 测试结果
+
+**全部测试通过:**
+```
+ok  github.com/openclaw/openclaw-go/internal/config
+ok  github.com/openclaw/openclaw-go/internal/cron
+ok  github.com/openclaw/openclaw-go/internal/formattime
+ok  github.com/openclaw/openclaw-go/internal/infra
+ok  github.com/openclaw/openclaw-go/internal/infra/archivepath
+ok  github.com/openclaw/openclaw-go/internal/infra/backoff
+ok  github.com/openclaw/openclaw-go/internal/infra/dotenv
+ok  github.com/openclaw/openclaw-go/internal/infra/home
+ok  github.com/openclaw/openclaw-go/internal/infra/securerandom
+ok  github.com/openclaw/openclaw-go/internal/pairing
+ok  github.com/openclaw/openclaw-go/internal/sessions
+ok  github.com/openclaw/openclaw-go/internal/shared
+ok  github.com/openclaw/openclaw-go/internal/utils
+```
+
+### 累计测试统计
+
+| 指标 | 数量 |
+|------|------|
+| Go 测试文件 | 22 个 |
+| 累计测试用例 | 234 个 |
+
+### 后续工作
+
+1. **高优先级**: 继续移植 gateway 相关测试
+2. **中优先级**: 为 infra/net 添加 SSRF 测试
+3. **低优先级**: 补充更多边界条件测试
+
+*最后更新: 2026-02-28"
