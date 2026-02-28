@@ -946,3 +946,70 @@ Agent Client Protocol 集成，用于 IDE 客户端：
 3. **低优先级**: 完善 `channels` 模块的监控功能
 
 *最后更新: 2026-02-28*
+
+## 第 87 轮工作记录 (2026-02-28)
+
+### 完成工作
+
+本轮专注于代码质量优化和清理，修复了多个 go vet 发现的问题。
+
+### 代码清理
+
+| 类型 | 文件 | 修改内容 |
+|------|------|----------|
+| 删除重复 | `internal/infra/archive_path.go` | 删除，使用 `internal/infra/archivepath/` 替代 |
+| 修复 panic | `internal/infra/pairing_token.go` | 返回 error 而非 panic |
+| 修复 panic | `internal/infra/node_pairing.go` | 处理 token 生成错误 |
+| 修复 panic | `internal/providers/github_copilot_models.go` | 返回 error 而非 panic |
+
+### 重复代码统一
+
+| 函数 | 原位置 | 修改 |
+|------|--------|------|
+| `sortStrings()` | `channels/telegram/accounts.go` | 改用 `sort.Strings()` |
+| `sortStrings()` | `channels/discord/accounts.go` | 改用 `sort.Strings()` |
+| `sortStrings()` | `agents/system_prompt.go` | 改用 `sort.Strings()` |
+| `sortStrings()` | `agents/sandbox/config_hash.go` | 改用 `sort.Strings()` |
+
+### go vet 问题修复
+
+| 文件 | 行号 | 问题 | 修复 |
+|------|------|------|------|
+| `signal/types.go` | 155 | 不可达代码（重复return） | 删除重复行 |
+| `tui/theme/theme.go` | 58, 65 | fmt.Sprintf 格式错误 | 修复格式字符串 |
+| `agents/pi_embedded_helpers.go` | 219 | 冗余条件 `502 || 502` | 删除重复条件 |
+| `plugins/hooks.go` | 多处 | `string(len())` 返回 rune | 改用 `strconv.Itoa()` |
+| `plugins/manifest_registry_data.go` | 269 | `string(int64)` 返回 rune | 改用 `strconv.FormatInt()` |
+
+### 新增文件
+
+| 文件 | 行数 | 功能描述 |
+|------|------|----------|
+| `internal/agents/agent_paths.go` | ~40 | Agent 目录路径解析 |
+| `internal/agents/agent_scope.go` | ~250 | Agent 作用域和配置解析 |
+| `internal/agents/skills/` | ~500 | 技能系统完整实现 |
+| `internal/agents/tool_catalog.go` | ~200 | 工具目录管理 |
+| `internal/gateway/server_http.go` | ~300 | HTTP 服务器实现 |
+| `internal/gateway/agent_event_assistant_text.go` | ~150 | 助手文本事件处理 |
+| `internal/gateway/chat_abort.go` | ~100 | 聊天中止功能 |
+
+### 编译状态
+
+✅ 全部编译通过
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| Go 文件 | **748+** |
+| 修复 panic | 4 处 |
+| 删除重复代码 | 1 文件 |
+| go vet 修复 | 5 处 |
+
+### 后续工作
+
+1. **高优先级**: 补充 `agents` 模块缺失的文件（TS 331 vs Go 132）
+2. **中优先级**: 补充 `gateway` 模块缺失的文件（TS 183 vs Go 63）
+3. **中优先级**: 补充 `commands` 模块缺失的文件（TS 213 vs Go 83）
+
+*最后更新: 2026-02-28*
