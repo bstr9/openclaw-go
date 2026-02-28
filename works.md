@@ -2316,11 +2316,67 @@ ok  github.com/openclaw/openclaw-go/internal/utils
 | 修复功能缺陷 | 3 处 |
 | 后台分析任务 | 2 个 |
 
+## 第 104 轮工作记录 (2026-02-28)
+
+### 完成工作
+
+本轮专注于从 TypeScript 原版移植更多测试用例，提高测试覆盖率。
+
+### 新增测试文件
+
+| 文件 | 行数 | 测试数量 | 功能描述 |
+|------|------|----------|----------|
+| `infra/backoff/backoff_test.go` | ~310 | 19 | 指数退避测试 - ComputeBackoff、SleepWithAbort、SleepWithChannel、RetryWithBackoff 等 |
+| `infra/archivepath/archivepath_test.go` | ~210 | 10 | 归档路径验证测试 - ValidateArchiveEntryPath、StripArchivePath、SafeExtractPath 等 |
+
+### 测试结果
+
+**全部测试通过:**
+```
+ok  github.com/openclaw/openclaw-go/internal/cron
+ok  github.com/openclaw/openclaw-go/internal/infra
+ok  github.com/openclaw/openclaw-go/internal/infra/archivepath
+ok  github.com/openclaw/openclaw-go/internal/infra/backoff
+ok  github.com/openclaw/openclaw-go/internal/infra/dotenv
+ok  github.com/openclaw/openclaw-go/internal/infra/home
+ok  github.com/openclaw/openclaw-go/internal/infra/securerandom
+ok  github.com/openclaw/openclaw-go/internal/pairing
+ok  github.com/openclaw/openclaw-go/internal/sessions
+ok  github.com/openclaw/openclaw-go/internal/shared
+ok  github.com/openclaw/openclaw-go/internal/utils
+```
+
+### 测试覆盖统计
+
+| 指标 | 数量 |
+|------|------|
+| Go 测试文件 | 21 个 (新增 2 个) |
+| 新增测试用例 | 29 个 |
+| 新增测试代码 | ~520 行 |
+
+### 累计测试统计
+
+| 模块 | Go 测试文件 | 测试用例 |
+|------|-------------|----------|
+| config | 1 | 10 |
+| cron | 2 | 25 |
+| formattime | 2 | 18 |
+| infra (root) | 2 | 21 |
+| infra/archivepath | 1 | 10 |
+| infra/backoff | 1 | 19 |
+| infra/dotenv | 1 | 10 |
+| infra/home | 1 | 5 |
+| infra/securerandom | 1 | 8 |
+| pairing | 2 | 39 |
+| sessions | 2 | 20 |
+| shared | 3 | 25 |
+| utils | 2 | 17 |
+| **总计** | **21** | **227** |
+
 ### 后续工作
 
-1. **最高优先级**: 实现 config 模块核心文件（types, zod-schema, validation）
-2. **高优先级**: 补充 cli 模块实现（daemon-cli, gateway-cli, node-cli）
-3. **中优先级**: 完成 gateway/server 相关文件
-4. **低优先级**: 清理 parseInt、parseBooleanValue 等重复函数
+1. **高优先级**: 继续移植 gateway 相关测试
+2. **中优先级**: 为 infra/net 添加 SSRF 测试
+3. **低优先级**: 补充更多边界条件测试
 
-*最后更新: 2026-02-28*
+*最后更新: 2026-02-28"
