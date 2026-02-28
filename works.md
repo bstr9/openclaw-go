@@ -2596,3 +2596,75 @@ ok  github.com/openclaw/openclaw-go/internal/formattime
 4. **低优先级**: 继续补充 infra 模块测试
 
 *最后更新: 2026-03-01*
+
+## 第 107 轮工作记录 (2026-03-01)
+
+### 完成工作
+
+本轮专注于代码质量优化，清理了大量未使用代码。
+
+### 清理的未使用代码
+
+**agents 模块 (17处):**
+| 文件 | 删除内容 |
+|------|----------|
+| `agent_scope.go` | `stripNullBytes()` 函数 |
+| `auth_profiles.go` | `authProfileStoreCachePath` 变量 |
+| `bash_tools_exec.go` | `mu` 字段 |
+| `model_fallback.go` | `sameModelCandidate()` 函数 |
+| `pi_embedded_subscribe.go` | `finalTagScanRE` 变量, `normalizeTextForComparison()`, `stripTagsOutsideCodeSpans()` 函数 |
+| `sanitize_for_prompt.go` | `isControlOrFormat()` 函数 |
+| `tools/cron.go` | `stripExistingContext()`, `truncateText()` 函数 |
+| `tools/image.go` | `resolveImageToolMaxTokens()` 函数 |
+| `tools/memory.go` | `resolveMemoryCitationsMode()`, `decorateCitations()`, `formatCitation()`, `deriveChatTypeFromSessionKey()`, `shouldIncludeCitations()`, `buildMemorySearchUnavailableResult()` 函数 |
+| `tools/nodes.go` | `resolveNodeId()`, `isPairingRequiredMessage()` 函数 |
+| `tools/subagents.go` | `resolveSubagentLabel()`, `resolveRunStatus()` 函数 |
+| `tools/web.go` | `getEnvOrDefault()` 函数 |
+
+**infra 模块 (8处):**
+| 文件 | 删除内容 |
+|------|----------|
+| `channel_activity.go` | `ensureEntry()` 函数 |
+| `control_ui_assets.go` | `isWindows()`, `summarizeCommandOutput()` 函数 |
+| `env.go` | `formatEnvValue()` 函数 |
+| `install_flow.go` | `archiveLoggerAdapter` 类型和方法 |
+| `install_package_dir.go` | `isObjectRecord()` 函数 |
+| `install_source_utils.go` | `toOptionalString()`, `parseResolvedSpecFromId()`, `normalizeNpmPackEntry()`, `parseNpmPackJsonOutput()` 函数 |
+| `provider_usage_fetch.go` | `claudeUsageData`, `claudeWindowData` 类型 |
+
+**其他模块 (4处):**
+| 文件 | 删除内容 |
+|------|----------|
+| `autoreply/command_auth.go` | `float64ToStr()` 函数 |
+| `autoreply/reply/inbound_dedupe.go` | `normalizeProviderPtr()` 函数 |
+| `autoreply/reply/reply_dispatcher.go` | `sendChain` 字段 |
+| `autoreply/reply/reply_payloads.go` | `extractReplyToTagCompat()` 函数 |
+
+**其他清理:**
+| 文件 | 删除内容 |
+|------|----------|
+| `logger/logger.go` | `formatLocalDate()` 函数 |
+| `markdown/ir.go` | `tableCell` 和 `tableState` 的未使用字段 |
+
+### 编译状态
+
+✅ 全部编译通过
+✅ 现有测试通过 (除 pre-existing PID 测试)
+
+### 统计
+
+| 指标 | 数量 |
+|------|------|
+| 修改文件 | 27 |
+| 删除代码行数 | ~480 行 |
+| 清理未使用函数 | 30+ 个 |
+| 清理未使用变量/字段 | 8 处 |
+
+### 后续工作
+
+1. **高优先级**: 实现 config 模块核心文件 (validation, defaults)
+2. **中优先级**: 补充 cli 模块实现 (仅 11% 完成度)
+3. **低优先级**: 继续清理剩余未使用代码
+
+*最后更新: 2026-03-01*
+
